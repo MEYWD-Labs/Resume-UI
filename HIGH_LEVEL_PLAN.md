@@ -9,40 +9,51 @@
 ## Dependency Tree Overview
 
 ```
-Resume-UI (Frontend Application)
-├── DEPENDS ON: Resume-SSO (authentication/session management)
-├── DEPENDS ON: Resume-API (all backend operations)
+Resume-UI (Web Frontend Application)
+├── DEPENDS ON:
+│   ├── Resume-SSO (authentication/session management)
+│   ├── Resume-API (all backend operations)
+│   └── Resume-Account-API (subscription management)
 │
-├── MVP-1: Core Resume Builder ⟶ Blocks: User onboarding
-│   ├── Authentication Integration (uses SSO)
+├── BLOCKS: None (end-user facing application)
+
+Services that Resume-UI DEPENDS ON:
+├── Resume-SSO (MVP-1: Authentication, OAuth)
+├── Resume-API (MVP-1: Resume CRUD, templates, exports)
+├── Resume-Account-API (MVP-2: Subscriptions, billing)
+└── Resume-Processor (indirect: via Resume-API for jobs)
+
+MVP Breakdown:
+├── MVP-1: Core Resume Builder ⟶ Blocks: Nothing (user-facing)
+│   ├── Authentication Integration (uses Resume-SSO)
 │   ├── User Dashboard
 │   ├── Resume Editor (WYSIWYG)
 │   ├── Template System
 │   └── Basic PDF Export UI
 │
-├── MVP-2: Payment UI & Feature Gating ⟶ Blocks: Premium features
+├── MVP-2: Payment UI & Feature Gating ⟶ Uses: Resume-Account-API
 │   ├── Pricing Page
 │   ├── Stripe Checkout Integration
 │   ├── Subscription Management
 │   └── Feature Gating (client-side)
 │
-├── MVP-3: Import & Advanced Editor ⟶ Blocks: Import features
+├── MVP-3: Import & Advanced Editor ⟶ Uses: Resume-API import features
 │   ├── Import UI (PDF, DOCX, LinkedIn)
 │   ├── Advanced Template Customization
 │   ├── Smart Content Suggestions
 │   └── Multi-format Export UI
 │
-├── MVP-4: Personal Website UI ⟶ Blocks: Website builder features
+├── MVP-4: Personal Website UI ⟶ Uses: Resume-API website features
 │   ├── Website Generator UI
 │   ├── Website Customization
 │   └── Domain Management
 │
-├── MVP-5: AI Features UI ⟶ Blocks: AI-assisted features
+├── MVP-5: AI Features UI ⟶ Uses: Resume-API AI features
 │   ├── AI Content Suggestions UI
 │   ├── Resume Analysis Dashboard
 │   └── Smart Rewriting Interface
 │
-└── MVP-6: Collaboration & Analytics UI ⟶ Blocks: Advanced features
+└── MVP-6: Collaboration & Analytics UI ⟶ Uses: Resume-API collaboration
     ├── Sharing Interface
     ├── Real-time Collaboration UI
     └── Analytics Dashboard
@@ -54,7 +65,7 @@ Resume-UI (Frontend Application)
 
 **Status**: MUST BUILD AFTER Resume-SSO and Resume-API (MVP-1) are ready
 **Dependencies**: Resume-SSO (MVP-1.4: Login), Resume-API (MVP-1.3: Resume CRUD)
-**Blocks**: All user features
+**Blocks**: None (end-user facing UI)
 
 ### Epic 1.1: Authentication Integration
 **What**: Integrate with Resume-SSO for user authentication
@@ -696,27 +707,33 @@ Resume-UI (Frontend Application)
 
 ## What Blocks What
 
-| This Epic | Blocks These Epics |
-|-----------|-------------------|
-| MVP-1.1 (Authentication) | All user features |
-| MVP-1.2 (Dashboard) | Resume management UI |
-| MVP-1.3 (Editor) | All resume editing features |
-| MVP-1.4 (Templates) | Resume customization |
-| MVP-2.2 (Stripe Checkout) | All premium features |
-| MVP-2.4 (Feature Gating) | Premium feature visibility |
-| MVP-4.1 (Website Generator) | Personal website features |
-| MVP-5.1 (AI Content UI) | AI-assisted features |
-| MVP-6.1 (Sharing) | Collaboration features |
+Note: Resume-UI is an end-user facing application and doesn't block other services. It depends on backend services.
 
-**External Dependencies**:
-- Resume-SSO (MVP-1.4: Login) ⟶ Blocks Epic 1.1 (Authentication Integration)
-- Resume-API (MVP-1.3: Resume CRUD) ⟶ Blocks Epic 1.2 (Dashboard) and Epic 1.3 (Editor)
-- Resume-API (MVP-1.5: PDF Export) ⟶ Blocks Epic 1.5 (PDF Export UI)
-- Resume-API (MVP-2.1: Stripe) ⟶ Blocks Epic 2.2 (Stripe Checkout)
-- Resume-API (MVP-3: Import Features) ⟶ Blocks Epic 3.1 (Import UI)
-- Resume-API (MVP-4: Website Generation) ⟶ Blocks Epic 4.1 (Website Generator)
-- Resume-API (MVP-5: AI Features) ⟶ Blocks MVP-5 (AI Features UI)
-- Resume-API (MVP-6: Collaboration) ⟶ Blocks MVP-6 (Collaboration UI)
+| This Epic | Depends On These Services |
+|-----------|--------------------------|
+| MVP-1.1 (Authentication) | Resume-SSO (MVP-1.4: Login) |
+| MVP-1.2 (Dashboard) | Resume-API (MVP-1.3: Resume CRUD) |
+| MVP-1.3 (Editor) | Resume-API (MVP-1.3: Resume CRUD) |
+| MVP-1.4 (Templates) | Resume-API (MVP-1.4: Templates) |
+| MVP-1.5 (PDF Export UI) | Resume-API (MVP-1.5: PDF Export) |
+| MVP-2.2 (Stripe Checkout) | Resume-Account-API (MVP-2: Billing) |
+| MVP-2.3 (Subscription) | Resume-Account-API (MVP-2.2: Subscriptions) |
+| MVP-2.4 (Feature Gating) | Resume-Account-API (MVP-2.2: Subscriptions) |
+| MVP-3.1 (Import UI) | Resume-API (MVP-3: Import Features) |
+| MVP-3.3 (Smart Content) | Resume-API (MVP-5.1: AI Suggestions) |
+| MVP-4.1 (Website Generator) | Resume-API (MVP-4: Website Generation) |
+| MVP-5.1 (AI Content UI) | Resume-API (MVP-5: AI Features) |
+| MVP-5.2 (Analysis UI) | Resume-API (MVP-5.2: ATS Analysis) |
+| MVP-6.1 (Sharing) | Resume-API (MVP-6.1: Sharing) |
+| MVP-6.2 (Collaboration) | Resume-API (MVP-6.2: Real-time) |
+| MVP-6.3 (Analytics) | Resume-API (MVP-6.3: Analytics) |
+
+**External Dependencies Required**:
+- Resume-SSO (MVP-1.4: Login) ⟶ Required for Epic 1.1 (Authentication Integration)
+- Resume-SSO (MVP-3: OAuth) ⟶ Required for OAuth login buttons
+- Resume-API (MVP-1: Core) ⟶ Required for all resume operations
+- Resume-Account-API (MVP-2: Billing) ⟶ Required for subscription features
+- Resume-Processor (indirect via Resume-API) ⟶ Handles background jobs
 
 ---
 
